@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import useGetUserID from '../hooks/useGetUserID';
 
 
 const CreateRecipe = () => {
+
+  const userID = useGetUserID();
 
   const [recipe, setRecipe] = useState({
     name: "",
@@ -9,8 +13,8 @@ const CreateRecipe = () => {
     instruction: "",
     imageUrl: "",
     cookingTime: 0,
-    userOwner: 0,
-  })
+    userOwner: userID,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -28,12 +32,20 @@ const CreateRecipe = () => {
     setRecipe({...recipe, ingredients: [...recipe.ingredients, ""]})
   }
 
-  console.log(recipe)
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:3001/recipes', recipe);
+      alert("Recipe Created");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className='create-recipe'>
       <h2>Create Recipe</h2>
-      <form>
+      <form onSubmit={onSubmit}>
         <label htmlFor="name"> Name </label>
         <input type="text" id="name" name='name' onChange={handleChange}/>
 
@@ -43,8 +55,8 @@ const CreateRecipe = () => {
         ))}
         <button onClick={addIngredient} type='button'>Add Ingredient</button>
 
-        <label htmlFor='instructions'>Instructions</label>
-        <textarea id='instructions' name='instructions' onChange={handleChange}></textarea>
+        <label htmlFor='instruction'>Instructions</label>
+        <textarea id='instruction' name='instruction' onChange={handleChange}></textarea>
 
         <label htmlFor="imageUrl"> Image URL </label>
         <input type="text" id="mageUrl" name='mageUrl' onChange={handleChange} />
@@ -55,7 +67,7 @@ const CreateRecipe = () => {
         <button type='submit'>Create Recipe</button>
       </form>
     </div>
-  )
-}
+  );
+};
 
 export default CreateRecipe
